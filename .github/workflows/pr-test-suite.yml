@@ -1,0 +1,28 @@
+name: PR Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2025-09-03
+          components: rustfmt, clippy
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Build and test
+        run: |
+          make build PYTHON_VERSION=python${{ matrix.python-version }}
+          make test
