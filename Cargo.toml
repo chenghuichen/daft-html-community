@@ -1,0 +1,16 @@
+[package]
+name = "daft-html"
+version = "0.1.0"
+edition = "2021"
+description = "Daft native extension for HTML processing — parsing, extraction, and transformation operators"
+license = "Apache-2.0"
+repository = "https://github.com/daft-engine/daft-html"
+
+[lib]
+name = "daft_html"
+crate-type = ["cdylib"]
+
+[dependencies]
+daft-ext = { version = "0.1.1", features = ["arrow-58"] }
+arrow = { version = "58", features = ["ffi"] }
+scraper = "0.26.0"

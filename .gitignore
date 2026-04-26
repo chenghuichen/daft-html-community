@@ -1,0 +1,17 @@
+# Rust build artifacts
+/target/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+
+uv.lock
+
+# Compiled extension (built from target/, not checked in)
+daft_html/*.so
+daft_html/*.dylib
+daft_html/*.dll
