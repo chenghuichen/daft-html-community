@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import os
 import platform
+import subprocess
 from pathlib import Path
 
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
@@ -44,16 +45,25 @@ class CustomBuildHook(BuildHookInterface):
         else:
             base = Path("target/release")
 
-        candidates = [
-            *base.glob("libdaft_html*.so"),
-            *base.glob("libdaft_html*.dylib"),
-            *base.glob("daft_html*.dll"),
-        ]
+        def _find_artifacts(d: Path) -> list[Path]:
+            return [
+                *d.glob("libdaft_html*.so"),
+                *d.glob("libdaft_html*.dylib"),
+                *d.glob("daft_html*.dll"),
+            ]
+
+        candidates = _find_artifacts(base)
+        if not candidates:
+            cmd = ["cargo", "build", "--release"]
+            if target:
+                cmd += ["--target", target]
+            subprocess.check_call(cmd)
+            candidates = _find_artifacts(base)
+
         if not candidates:
             raise FileNotFoundError(
                 f"No compiled daft-html library found in {base}.\n"
-                "Run `cargo build --release` (or `cargo zigbuild --release "
-                "--target <triple>.<glibc>`) before calling `python -m build`."
+                "Ensure Rust is installed and `cargo build --release` succeeds."
             )
         artifact = candidates[0]
 
@@ -83,7 +93,7 @@ def _detect_plat_tag() -> str:
 
     if system == "Linux":
         arch = "x86_64" if machine == "x86_64" else "aarch64"
-        return f"manylinux_2_17_{arch}.manylinux2014_{arch}"
+        return f"manylinux_2_28_{arch}"
     elif system == "Darwin":
         arch = "arm64" if machine == "arm64" else "x86_64"
         min_ver = "11_0" if arch == "arm64" else "10_14"
