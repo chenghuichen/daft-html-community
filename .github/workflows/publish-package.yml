@@ -64,6 +64,7 @@ jobs:
             curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly-2025-09-03 --profile minimal
           CIBW_ENVIRONMENT_LINUX: PATH="$HOME/.cargo/bin:$PATH"
           CIBW_BEFORE_BUILD: cargo build --release
+          CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
           CIBW_TEST_REQUIRES: pytest
           CIBW_TEST_COMMAND: pytest --import-mode=importlib {project}/tests -v
 

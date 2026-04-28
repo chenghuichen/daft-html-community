@@ -71,7 +71,11 @@ class CustomBuildHook(BuildHookInterface):
         # force_include maps the on-disk source path → destination path inside
         # the wheel archive.  This is equivalent to a manual cp + artifacts
         # entry but works without touching the source tree.
-        dest_in_wheel = f"daft_html/{artifact.name}"
+        # Normalize to .so on Unix (Python convention — daft expects *.so on all Unix platforms)
+        name = artifact.name
+        if platform.system() != "Windows":
+            name = artifact.stem + ".so"
+        dest_in_wheel = f"daft_html/{name}"
         build_data["force_include"][str(artifact)] = dest_in_wheel
 
         # ── Set platform-specific wheel tag ───────────────────────────────────
